@@ -246,7 +246,11 @@ interface FixtureSessionApi {
     readonly agentPreset?: string
   }): Promise<ConnectionRpcResult<unknown>>
   rename(request: { readonly sessionId: SessionId; readonly title: string }): Promise<ConnectionRpcResult<unknown>>
-  fork(request: { readonly sessionId: SessionId; readonly atSeq?: number }): Promise<ConnectionRpcResult<unknown>>
+  fork(request: {
+    readonly sessionId: SessionId
+    readonly atSeq?: number
+    readonly exclusive?: boolean
+  }): Promise<ConnectionRpcResult<unknown>>
   history(request: {
     readonly sessionId: SessionId
     readonly throughSeq?: number

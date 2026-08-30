@@ -136,9 +136,22 @@ export function apply(ctx: Context): void {
             },
             read: () => chatScrollPositions.get(sessionId) ?? null,
           },
-          forkAt: (seq) => {
-            ctx.sessions.fork({ sessionId, atSeq: seq, increaseTitle: true })
-              .then((childId) => { ctx.sessions.open(childId) })
+          forkAt: (seq, prefill, exclusive) => {
+            ctx.sessions.fork({
+              sessionId, atSeq: seq, increaseTitle: true,
+              ...(exclusive === true ? { exclusive: true } : {}),
+            })
+              .then((childId) => {
+                if (prefill !== undefined && prefill !== '') {
+                  // Edit-and-resend affordance: land the anchored user text in
+                  // the child's composer through the conversation input face.
+                  const conversation = ctx.get('conversation') as
+                    | { input?: { shell?: (id: string) => { setDraft: (text: string) => void } } }
+                    | undefined
+                  try { conversation?.input?.shell?.(childId)?.setDraft(prefill) } catch { /* draft is best-effort */ }
+                }
+                ctx.sessions.open(childId)
+              })
               .catch(() => {
                 // Fork or child-title failure leaves the source view unchanged.
               })

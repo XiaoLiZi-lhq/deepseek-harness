@@ -306,6 +306,13 @@ export interface SessionRenameValue {
 export interface SessionForkRequest {
   readonly sessionId: SessionId
   readonly atSeq?: number
+  /**
+   * Anchor the cut BEFORE the turn containing `atSeq` (the last completed
+   * turn that ends before it) instead of after it: the seed then excludes
+   * that turn entirely, so a caller can re-send an edited version of the
+   * user message that opened it.
+   */
+  readonly exclusive?: boolean
 }
 
 /** Identity of a newly forked Session. */
